@@ -1,8 +1,9 @@
 import fs from "fs/promises";
 
-class ProductManager {
-    constructor() {
+export default class ProductManager {
+    constructor(ruta) {
         this.products = [];
+        this.ruta = ruta;
     }
 
     async addProduct(data) {
@@ -27,12 +28,14 @@ class ProductManager {
                 return
             }
 
-            const file = await fs.readFile("./products.json", "utf8");
-            const products = JSON.parse(file);
+            //const file = await fs.readFile("./products.json", "utf8");
+            //const products = JSON.parse(file);
+            const products = await this.getProducts();
             products.push(newProduct);
 
-            await fs.writeFile("./products.json", JSON.stringify(products));
             this.products.push(newProduct);
+            await fs.writeFile(this.ruta, JSON.stringify(products));
+
             return newProduct;
         } catch (e) {
             console.log(e);
@@ -41,15 +44,15 @@ class ProductManager {
     };
 
     async getProducts() {
-        const file = await fs.readFile("./products.json", "utf8");
+        const file = await fs.readFile(this.ruta, "utf8");
+        console.log(file)
         const products = JSON.parse(file);
-        console.log(products);
+
         return products;
-        //   console.table(this.products);
-        //   return this.products;
     };
 
-    getProductById(id) {
+    async getProductById(id) {
+        this.products = await this.getProducts();
         const product = this.products.find((p) => p.id === id);
         if (!product) {
             console.error("Not found");
@@ -87,13 +90,14 @@ class ProductManager {
 
     async saveProducts() {
         try {
-          await fs.writeFile("./products.json", JSON.stringify(this.products));
+            await fs.writeFile(this.ruta, JSON.stringify(this.products));
         } catch (error) {
-          console.log("Error al guardar los productos:", error);
+            console.log("Error al guardar los productos:", error);
         }
-      }
+    }
 
     async updateProduct(id, updatedFields) {
+        this.products = this.getProducts();
         try {
             const productIndex = this.products.findIndex((p) => p.id === id);
             if (productIndex === -1) {
@@ -119,6 +123,7 @@ class ProductManager {
 
 
     } async deleteProduct(id) {
+        this.products = this.getProducts();
         try {
             const productIndex = this.products.findIndex((p) => p.id === id);
             if (productIndex === -1) {
@@ -138,14 +143,14 @@ class ProductManager {
 }
 
 
-const test = new ProductManager();
+const test = new ProductManager("./products.json");
 
-await test.addProduct({ title: "zapatillas", description: "zara negras", price: 1000, thumbnail: "http://a", code: 1000, stock: 50 });
-await test.addProduct({ title: "botas", description: "zara blancas", price: 1080, thumbnail: "http://dfg", code: 1001, stock: 55 });
-await test.addProduct({ title: "ojotas", description: "havaianas", price: 400, thumbnail: "http://df", code: 1001, stock: 50 });
-await test.addProduct({ title: "zapatillas", price: 1200, thumbnail: "http://qw", code: 1003, stock: 50 });
-await test.addProduct({ title: "zapatillas", description: "adidas verdes", price: 900, thumbnail: "http://qwe", code: 1012, stock: 50 });
+//await test.addProduct({ title: "zapatillas", description: "zara negras", price: 1000, thumbnail: "http://a", code: 1000, stock: 50 });
+//await test.addProduct({ title: "botas", description: "zara blancas", price: 1080, thumbnail: "http://dfg", code: 1001, stock: 55 });
+//await test.addProduct({ title: "ojotas", description: "havaianas", price: 400, thumbnail: "http://df", code: 1001, stock: 50 });
+//await test.addProduct({ title: "zapatillas", price: 1200, thumbnail: "http://qw", code: 1003, stock: 50 });
+//await test.addProduct({ title: "zapatillas", description: "adidas verdes", price: 900, thumbnail: "http://qwe", code: 1012, stock: 50 });
 await test.getProducts();
-test.getProductById(2);
-await test.deleteProduct(2);
-await test.getProducts();
+//test.getProductById(1);
+//await test.deleteProduct(2);
+//await test.getProducts();
