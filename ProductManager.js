@@ -33,7 +33,7 @@ export default class ProductManager {
             const products = await this.getProducts();
             products.push(newProduct);
 
-            this.products.push(newProduct);
+            //this.products.push(newProduct);
             await fs.writeFile(this.ruta, JSON.stringify(products));
 
             return newProduct;
@@ -49,7 +49,7 @@ export default class ProductManager {
         const products = JSON.parse(file);
 
         return products;
-    };
+    };  
 
     async getProductById(id) {
         this.products = await this.getProducts();
@@ -97,7 +97,7 @@ export default class ProductManager {
     }
 
     async updateProduct(id, updatedFields) {
-        this.products = this.getProducts();
+        this.products = await this.getProducts();
         try {
             const productIndex = this.products.findIndex((p) => p.id === id);
             if (productIndex === -1) {
@@ -123,7 +123,7 @@ export default class ProductManager {
 
 
     } async deleteProduct(id) {
-        this.products = this.getProducts();
+        this.products = await this.getProducts();
         try {
             const productIndex = this.products.findIndex((p) => p.id === id);
             if (productIndex === -1) {
@@ -143,7 +143,7 @@ export default class ProductManager {
 }
 
 
-const test = new ProductManager("./products.json");
+const test = new ProductManager("../db/products.json");
 
 //await test.addProduct({ title: "zapatillas", description: "zara negras", price: 1000, thumbnail: "http://a", code: 1000, stock: 50 });
 //await test.addProduct({ title: "botas", description: "zara blancas", price: 1080, thumbnail: "http://dfg", code: 1001, stock: 55 });
