@@ -17,13 +17,37 @@ router.get('/', async (req, res) => {
     }
 });
 
-
 router.get('/:pid', async (req, res) => {
     const productId = parseInt(req.params.pid);
     const product = await productManager.getProductById(productId);
     console.log(product);
     if (product) {
         res.send(product);
+    } else {
+        res.status(404).send({ message: "Producto no encontrado" });
+    }
+});
+
+router.put('/:pid', async (req, res) => {
+    const productId = parseInt(req.params.pid);
+    const updatedProduct = req.body;
+
+    const product = await productManager.updateProduct(productId, updatedProduct);
+    console.log(product);
+    if (product) {
+        res.send(product);
+    } else {
+        res.status(404).send({ message: "Producto no encontrado" });
+    }
+});
+
+router.delete('/:pid', async (req, res) => {
+    const productId = parseInt(req.params.pid);
+    const deletedProduct = await productManager.deleteProduct(productId);
+    console.log(deleteProduct);
+
+    if (deletedProduct) {
+        res.send({ message: "Se ha borrado el producto" });
     } else {
         res.status(404).send({ message: "Producto no encontrado" });
     }
