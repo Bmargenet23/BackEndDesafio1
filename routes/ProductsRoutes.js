@@ -1,12 +1,12 @@
 import { Router } from "express";
 import ProductManager from "../ProductManager.js";
 
-const productManager = new ProductManager("../db/products.json");
+const productManager = new ProductManager("./db/products.json");
 export const router = Router();
 
 router.get('/', async (req, res) => {
     const products = await productManager.getProducts();
-    const {limit} = req.query;
+    const { limit } = req.query;
     console.log(limit);
 
     if (limit) {
@@ -30,12 +30,9 @@ router.get('/:pid', async (req, res) => {
 
 router.put('/:pid', async (req, res) => {
     const productId = parseInt(req.params.pid);
-    const updatedProduct = req.body;
-
-    const product = await productManager.updateProduct(productId, updatedProduct);
-    console.log(product);
-    if (product) {
-        res.send(product);
+    const updatedProduct = await productManager.updateProduct(productId, req.body);
+    if (updatedProduct) {
+        res.send(updatedProduct);
     } else {
         res.status(404).send({ message: "Producto no encontrado" });
     }

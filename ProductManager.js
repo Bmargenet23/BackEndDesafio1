@@ -49,7 +49,7 @@ export default class ProductManager {
         const products = JSON.parse(file);
 
         return products;
-    };  
+    };
 
     async getProductById(id) {
         this.products = await this.getProducts();
@@ -105,17 +105,15 @@ export default class ProductManager {
                 return;
             }
 
-            const updatedProduct = {
+            this.products[productIndex] = {
                 ...this.products[productIndex],
                 ...updatedFields,
-                id: this.products[productIndex].id, // me aseguro de que el ID no se modifique
+                id: this.products[productIndex].id,
             };
-
-            this.products[productIndex] = updatedProduct;
 
             await this.saveProducts();
 
-            return updatedProduct;
+            return this.products[productIndex];
         } catch (error) {
             console.log("Error al actualizar el producto:", error);
         }
@@ -135,7 +133,7 @@ export default class ProductManager {
 
             await this.saveProducts();
 
-            console.log("Producto eliminado correctamente");
+            return true;
         } catch (error) {
             console.log("Error al borrar el producto:", error);
         }
@@ -143,7 +141,7 @@ export default class ProductManager {
 }
 
 
-const test = new ProductManager("../db/products.json");
+const test = new ProductManager("./db/products.json");
 
 //await test.addProduct({ title: "zapatillas", description: "zara negras", price: 1000, thumbnail: "http://a", code: 1000, stock: 50 });
 //await test.addProduct({ title: "botas", description: "zara blancas", price: 1080, thumbnail: "http://dfg", code: 1001, stock: 55 });

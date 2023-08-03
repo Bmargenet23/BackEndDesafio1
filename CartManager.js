@@ -15,8 +15,9 @@ export default class CartManager {
 
       this.carts.push(newCart);
       await this.saveCarts();
-
+      
       return newCart;
+
     } catch (e) {
       console.log(e);
     }
