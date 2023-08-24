@@ -2,9 +2,12 @@ import express from "express";
 import handlebars from "express-handlebars";
 import http from "http";
 import { Server } from "socket.io";
-import ProductManager from "./ProductManager.js";
+//import ProductManager from "./dao/file/ProductManager.js";
+import ProductManager from "./dao/mongo/ProductManager.js";
 import { router as productsRouter } from "./routes/ProductsRoutes.js";
 import { router as cartsRouter } from "./routes/CartRoutes.js";
+import mongoose from "mongoose";
+import messagesManagerDB from "./dao/mongo/messagesManager.js";
 
 const app = express()
 const server = http.createServer(app);
@@ -36,34 +39,45 @@ handlebars.create({
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 
+const messageManager = new messagesManagerDB();
+const conn = mongoose.connect("mongodb+srv://brianmargenet:34100067@coderbrian.6oeo6iu.mongodb.net/?retryWrites=true&w=majority")
 
 app.get("/", async (req, res) => {
   const products = await test.getProducts();
   res.render("home", { products });
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   console.log("Un cliente se ha conectado");
 
-  socket.on("addProduct", (productData) => {
+  //socket.on("addProduct", (productData) => {
 
-    console.log("Evento addProduct recibido:", productData);
-
-    io.emit("productAdded", newProduct);
-  });
-
-
-  socket.on("deleteProduct", (productId) => {
-
-    console.log("Evento deleteProduct recibido:", productId);
-
-    io.emit("productDeleted", productId);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Cliente desconectado");
-  });
+  const messages = await messageManager.getMessages();
+  socket.emit("messageLogs", messages)
 });
+
+
+socket.on("deleteProduct", async (data) => {
+
+  console.log("Evento deleteProduct recibido:", data.productId);
+
+  await productManager.deleteProductbyId(data.productId)
+  socket.emit('products', await productManager.getProducts())
+});
+
+
+socket.on("message", async (data) => {
+  let user = data.user;
+  let message = data.message;
+  await messageManager.addMessage(user, message)
+  const messages = await messageManager.getMessages();
+  socket.emit("messageLogs", messages)
+})
+
+socket.on("disconnect", () => {
+  console.log("Cliente desconectado");
+});
+
 
 
 app.listen(8080, () => {
